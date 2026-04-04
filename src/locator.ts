@@ -350,7 +350,7 @@ export default class Locator {
 				this.biome.logger.warn(
 					`🔍 Could not find global Node Modules path for ${key}`,
 				);
-				return;
+				continue;
 			}
 
 			const biome = await this.findBiomeInNodeModules(path);
@@ -432,6 +432,16 @@ export default class Locator {
 					`🔍 Found Biome binary at "${biome.fsPath}" in PATH`,
 				);
 				return biome;
+			}
+
+			if (process.platform === "win32") {
+				const biomeCmd = Uri.joinPath(Uri.file(dir), "biome.cmd");
+				if (await fileExists(biomeCmd)) {
+					this.biome.logger.debug(
+						`🔍 Found Biome binary at "${biomeCmd.fsPath}" in PATH`,
+					);
+					return biomeCmd;
+				}
 			}
 		}
 
